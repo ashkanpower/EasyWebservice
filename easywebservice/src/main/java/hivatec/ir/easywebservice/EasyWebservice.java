@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
 import org.json.JSONArray;
@@ -16,6 +17,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
@@ -73,6 +75,38 @@ public class EasyWebservice {
         this.bodies.put(key, value);
         return this;
     }
+
+
+    public EasyWebservice addParam(JSONObject json) {
+
+
+        Iterator<String> iter = json.keys();
+        while (iter.hasNext()) {
+            String key = iter.next();
+            try {
+                Object value = json.get(key);
+                this.bodies.put(key, value);
+            } catch (JSONException e) {
+                // Something went wrong!
+            }
+        }
+
+        return this;
+    }
+
+
+    public EasyWebservice addParam(Object object) {
+
+        try {
+            JSONObject json = new JSONObject(new Gson().toJson(object));
+            addParam(json);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return this;
+    }
+
 
     public EasyWebservice addHeader(String key, String value) {
 

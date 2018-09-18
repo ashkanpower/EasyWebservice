@@ -1,10 +1,12 @@
 # EasyWebservice 
 Fast and easy RESTful api calls for android.
 
+[![Android Arsenal]( https://img.shields.io/badge/Android%20Arsenal-EasyWebservice-green.svg?style=flat )]( https://android-arsenal.com/details/1/7117 )
+
 ## How to use
 Add jitpack to repositories
 ```
-llprojects {
+allprojects {
 		repositories {
 			...
 			maven { url 'https://jitpack.io' }
@@ -16,7 +18,7 @@ then add library to dependencies
 
 `````
 dependencies {
-	        implementation 'com.github.ashkanpower:easywebservice:25cd913b5e'
+	        implementation 'com.github.ashkanpower:easywebservice:57955d45b2'
 	}
 ``````
 

@@ -2,6 +2,7 @@
 Fast and easy RESTful api calls for android.
 
 [![Android Arsenal]( https://img.shields.io/badge/Android%20Arsenal-EasyWebservice-green.svg?style=flat )]( https://android-arsenal.com/details/1/7117 )
+[![](https://jitpack.io/v/ashkanpower/easywebservice.svg)](https://jitpack.io/#ashkanpower/easywebservice)
 
 ## How to use
 Add jitpack to repositories

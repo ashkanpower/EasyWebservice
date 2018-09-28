@@ -25,9 +25,12 @@ dependencies {
 
 ## Fast useage
 
-```JAVA
-
+response : 
+````
   //{res : true, msg : "success"}
+`````
+code :
+```JAVA
   new EasyWebservice("http://host.com/api/v1/test")
 				.method(Method.POST) //default
 				.addParam("id", 100) //adding params to body
@@ -48,10 +51,18 @@ dependencies {
 
 ## Object usage
 If you have object in your response you should define that object
-```JAVA
+
+
+response : 
+````
   //{ person : {id:10, name : "ashkan", lastname : "power"} }
-  
-  class Person {
+`````  
+
+code : 
+
+  ```JAVA
+  //define your class with the same attributes as the JSON response
+ public puclass Person {
     int id; //the same as object
     String name;
     String lastname;
@@ -73,13 +84,18 @@ If you have object in your response you should define that object
 				});
 ````
 
+# note : The class must be accessible by gson library
+
 ## array responses 
 
 EasyWebservice also handles array responses
 
-```JAVA
+response :
+`````
 ["California", "New York", "LA", "Texas"]
-
+``````
+code :
+```JAVA
 new EasyWebservice("http://host.com/api/v1/cities")
 				.call(new Callback.A<ArrayList<String>>() { //the mapping for root elements should be empty
 					@Override
@@ -95,6 +111,39 @@ new EasyWebservice("http://host.com/api/v1/cities")
 					}
 				});
 ```    
+
+It can easily be also an array of custom objects like this.
+
+response :
+`````
+[{id:10, name : "ashkan", lastname : "power"},
+{id:10, name : "ashkan", lastname : "power"},
+{id:10, name : "ashkan", lastname : "power"} ]
+````
+
+code : 
+```JAVA
+class Person {
+    int id; //the same as object
+    String name;
+    String lastname;
+  }
+
+new EasyWebservice("http://host.com/api/v1/cities")
+				.call(new Callback.A<ArrayList<Person>>() { //the mapping for root elements should be empty
+					@Override
+					public void onSuccess(ArrayList<Person> people) {
+          
+                   //work with the array
+					}
+
+					@Override
+					public void onError(String error) {
+          
+                    //if any error encountered
+					}
+				});
+`````
 
 ## More info
 The callback group has 5 levels

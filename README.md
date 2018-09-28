@@ -27,7 +27,7 @@ dependencies {
 
 response : 
 ````
-  //{res : true, msg : "success"}
+  {res : true, msg : "success"}
 `````
 code :
 ```JAVA
@@ -55,7 +55,7 @@ If you have object in your response you should define that object
 
 response : 
 ````
-  //{ person : {id:10, name : "ashkan", lastname : "power"} }
+  { person : {id:10, name : "ashkan", lastname : "power"} }
 `````  
 
 code : 

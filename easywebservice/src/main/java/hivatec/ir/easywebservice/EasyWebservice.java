@@ -35,21 +35,22 @@ import static javax.xml.transform.OutputKeys.MEDIA_TYPE;
 
 public class EasyWebservice {
 
-    public static String JSON_ERROR = "خطا در پردازش اطلاعات";
-    public static String REQUEST_ERROR = "خطا در درخواست اطلاعات";
-    public static String SERVER_ERROR = "خطای سیستم";
+    public static String JSON_ERROR = "Error parsing JSON";
+    public static String REQUEST_ERROR = "Request error";
+    public static String SERVER_ERROR = "Server error";
 
-    public HashMap<String, Object> bodies = new HashMap<>();
-    public HashMap<String, String> headers = new HashMap<>();
+    private HashMap<String, Object> bodies = new HashMap<>();
+    private HashMap<String, String> headers = new HashMap<>();
 
-    public static HashMap<String, Object> gBodies = new HashMap<>();
-    public static HashMap<String, String> gHeaders = new HashMap<>();
+    private static HashMap<String, Object> gBodies = new HashMap<>();
+    private static HashMap<String, String> gHeaders = new HashMap<>();
 
     OkHttpClient client = new OkHttpClient();
 
     private String urlStr = "";
     private String fakeJson = "";
     private Method method = Method.POST;
+    private int fakeJsonDelay = 3000;
 
     public EasyWebservice(String url){
 
@@ -68,6 +69,14 @@ public class EasyWebservice {
         this.fakeJson = json;
         return this;
     }
+
+    public EasyWebservice fakeJsonDelay(int randStart, int randEnd) {
+
+        this.fakeJsonDelay = (int) (Math.random() * (randEnd - randStart) + randStart);
+        Log.i("webservice", "delay : " + fakeJsonDelay + "");
+        return this;
+    }
+
 
 
     public EasyWebservice addParam(String key, Object value) {
@@ -175,14 +184,19 @@ public class EasyWebservice {
 
         if(fakeJson != null && !fakeJson.equals("")){
 
+            Log.i("webservice", (method == Method.POST ? "POST : " : "GET : ") + urlStr);
+            Log.i("webservice", "headers : " + new Gson().toJson(headers));
+            Log.i("webservice", "bodies : " + new Gson().toJson(bodies));
+
             final Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
 
+                    Log.i("webservice", "--> " + urlStr + " : " + fakeJson);
                     callback.onSuccess(fakeJson);
                 }
-            }, 5000);
+            }, fakeJsonDelay);
 
             return;
         }

@@ -86,7 +86,7 @@ code :
 				});
 ````
 
-# note : The class must be accessible by gson library
+# note : The class must be accessible by gson library. And also your proguard-rules should not change classes and attributes name. it is needed by gson library.
 
 ## array responses 
 

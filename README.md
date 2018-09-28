@@ -1,5 +1,6 @@
 # EasyWebservice 
-Fast and easy RESTful api calls for android.
+Fast and easy RESTful api calls for android.    
+If using Retrofit is hard, or you are tired of handling json responses, this library is for you.
 
 [![Android Arsenal]( https://img.shields.io/badge/Android%20Arsenal-EasyWebservice-green.svg?style=flat )]( https://android-arsenal.com/details/1/7117 )
 [![](https://jitpack.io/v/ashkanpower/easywebservice.svg)](https://jitpack.io/#ashkanpower/easywebservice)
@@ -25,40 +26,52 @@ dependencies {
 
 ## Fast useage
 
+response : 
+````
+  {res : true, msg : "success"}
+`````
+code :
 ```JAVA
-
-  //{res : true, msg : "success"}
   new EasyWebservice("http://host.com/api/v1/test")
-				.method(Method.POST) //default
-				.addParam("id", 100) //adding params to body
-				.call(new Callback.AB<Boolean, String>("res", "msg") { //should map response params
-					@Override
-					public void onSuccess(Boolean res, String msg) {
+	.method(Method.POST) //default
+	.addHeader("token", "your_token_hear")
+        .addParam("id", 100) //adding params to body
+        .call(new Callback.AB<Boolean, String>("res", "msg") { //should map response params
+		@Override
+		public void onSuccess(Boolean res, String msg) {
           
-                                           //you can work with res and msg which are in json response
-					}
+                        //you can work with res and msg which are in json response
+		}
 
-					@Override
-					public void onError(String error) {
+	        @Override
+		public void onError(String error) {
           
-                                          //if any error encountered
-					}
-				});
+                        //if any error encountered
+		}
+	});
 ```
 
 ## Object usage
 If you have object in your response you should define that object
-```JAVA
-  //{ person : {id:10, name : "ashkan", lastname : "power"} }
-  
-  class Person {
-    int id; //the same as object
+
+
+response : 
+````
+  { thePerson : {id:10, name : "ashkan", lastname : "power"} }
+`````  
+
+code : 
+
+  ```JAVA
+  //define your class with the same attributes as the JSON response
+ public class Person {
+    int id; 
     String name;
     String lastname;
   }
   
    new EasyWebservice("http://host.com/api/v1/person")
-				.call(new Callback.A<Person>("person") { //should map response params
+				.call(new Callback.A<Person>("thePerson") { //should map response params
 					@Override
 					public void onSuccess(Person person) {
           
@@ -73,13 +86,18 @@ If you have object in your response you should define that object
 				});
 ````
 
+# note : The class must be accessible by gson library. And also your proguard-rules should not change classes and attributes name. it is needed by gson library.
+
 ## array responses 
 
 EasyWebservice also handles array responses
 
-```JAVA
+response :
+`````
 ["California", "New York", "LA", "Texas"]
-
+``````
+code :
+```JAVA
 new EasyWebservice("http://host.com/api/v1/cities")
 				.call(new Callback.A<ArrayList<String>>() { //the mapping for root elements should be empty
 					@Override
@@ -95,6 +113,71 @@ new EasyWebservice("http://host.com/api/v1/cities")
 					}
 				});
 ```    
+
+It can easily be also an array of custom objects like this.
+
+response :
+`````
+[{id:10, name : "ashkan", lastname : "power"},
+{id:10, name : "ashkan", lastname : "power"},
+{id:10, name : "ashkan", lastname : "power"} ]
+``````
+
+code : 
+```JAVA
+class Person {
+    int id; //the same as object
+    String name;
+    String lastname;
+  }
+
+new EasyWebservice("http://host.com/api/v1/cities")
+				.call(new Callback.A<ArrayList<Person>>() { //the mapping for root elements should be empty
+					@Override
+					public void onSuccess(ArrayList<Person> people) {
+          
+                   //work with the array
+					}
+
+					@Override
+					public void onError(String error) {
+          
+                    //if any error encountered
+					}
+				});
+`````
+
+
+## Testing phase
+If you are coding your app but your webserver is not ready yet, you can use and test your app with easyWebservice.     
+You can use fakeJSON to test your code like this:     
+note : Just remember to delete the fakejson after your server is ready.     
+
+response : 
+````
+  {res : true, msg : "success"}
+`````
+code :
+```JAVA
+  new EasyWebservice("http://host.com/api/v1/test")
+	.addHeader("token", "your_token_hear")
+        .addParam("id", 100) //adding params to body
+	.fakeJson("{res : true, msg : \"success\"}") //this is the fake response
+	.fakeJsonDelay(2000, 5000) // this is the random delay you are expecting your connection needs in milisecs
+        .call(new Callback.AB<Boolean, String>("res", "msg") { //should map response params
+		@Override
+		public void onSuccess(Boolean res, String msg) {
+          
+                        //you can work with res and msg which are in json response
+		}
+
+	        @Override
+		public void onError(String error) {
+          
+                        //if any error encountered
+		}
+	});
+```
 
 ## More info
 The callback group has 5 levels

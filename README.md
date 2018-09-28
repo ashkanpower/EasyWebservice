@@ -1,5 +1,6 @@
 # EasyWebservice 
 Fast and easy RESTful api calls for android.
+If using Retrofit is hard, or you are tired of handling json responses, this library is for you.
 
 [![Android Arsenal]( https://img.shields.io/badge/Android%20Arsenal-EasyWebservice-green.svg?style=flat )]( https://android-arsenal.com/details/1/7117 )
 [![](https://jitpack.io/v/ashkanpower/easywebservice.svg)](https://jitpack.io/#ashkanpower/easywebservice)

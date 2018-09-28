@@ -32,21 +32,21 @@ response :
 code :
 ```JAVA
   new EasyWebservice("http://host.com/api/v1/test")
-				.method(Method.POST) //default
-				.addParam("id", 100) //adding params to body
-				.call(new Callback.AB<Boolean, String>("res", "msg") { //should map response params
-					@Override
-					public void onSuccess(Boolean res, String msg) {
+	.method(Method.POST) //default
+        .addParam("id", 100) //adding params to body
+        .call(new Callback.AB<Boolean, String>("res", "msg") { //should map response params
+		@Override
+		public void onSuccess(Boolean res, String msg) {
           
-                                           //you can work with res and msg which are in json response
-					}
+                        //you can work with res and msg which are in json response
+		}
 
-					@Override
-					public void onError(String error) {
+	        @Override
+		public void onError(String error) {
           
-                                          //if any error encountered
-					}
-				});
+                        //if any error encountered
+		}
+	});
 ```
 
 ## Object usage
@@ -55,21 +55,21 @@ If you have object in your response you should define that object
 
 response : 
 ````
-  { person : {id:10, name : "ashkan", lastname : "power"} }
+  { thePerson : {id:10, name : "ashkan", lastname : "power"} }
 `````  
 
 code : 
 
   ```JAVA
   //define your class with the same attributes as the JSON response
- public puclass Person {
-    int id; //the same as object
+ public class Person {
+    int id; 
     String name;
     String lastname;
   }
   
    new EasyWebservice("http://host.com/api/v1/person")
-				.call(new Callback.A<Person>("person") { //should map response params
+				.call(new Callback.A<Person>("thePerson") { //should map response params
 					@Override
 					public void onSuccess(Person person) {
           
@@ -119,7 +119,7 @@ response :
 [{id:10, name : "ashkan", lastname : "power"},
 {id:10, name : "ashkan", lastname : "power"},
 {id:10, name : "ashkan", lastname : "power"} ]
-````
+``````
 
 code : 
 ```JAVA

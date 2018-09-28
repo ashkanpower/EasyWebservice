@@ -1,5 +1,5 @@
 # EasyWebservice 
-Fast and easy RESTful api calls for android.
+Fast and easy RESTful api calls for android.    
 If using Retrofit is hard, or you are tired of handling json responses, this library is for you.
 
 [![Android Arsenal]( https://img.shields.io/badge/Android%20Arsenal-EasyWebservice-green.svg?style=flat )]( https://android-arsenal.com/details/1/7117 )
@@ -34,6 +34,7 @@ code :
 ```JAVA
   new EasyWebservice("http://host.com/api/v1/test")
 	.method(Method.POST) //default
+	.addHeader("token", "your_token_hear")
         .addParam("id", 100) //adding params to body
         .call(new Callback.AB<Boolean, String>("res", "msg") { //should map response params
 		@Override
@@ -145,6 +146,38 @@ new EasyWebservice("http://host.com/api/v1/cities")
 					}
 				});
 `````
+
+
+## Testing phase
+If you are coding your app but your webserver is not ready yet, you can use and test your app with easyWebservice.     
+You can use fakeJSON to test your code like this:     
+note : Just remember to delete the fakejson after your server is ready.     
+
+response : 
+````
+  {res : true, msg : "success"}
+`````
+code :
+```JAVA
+  new EasyWebservice("http://host.com/api/v1/test")
+	.addHeader("token", "your_token_hear")
+        .addParam("id", 100) //adding params to body
+	.fakeJson("{res : true, msg : \"success\"}") //this is the fake response
+	.fakeJsonDelay(2000, 5000) // this is the random delay you are expecting your connection needs in milisecs
+        .call(new Callback.AB<Boolean, String>("res", "msg") { //should map response params
+		@Override
+		public void onSuccess(Boolean res, String msg) {
+          
+                        //you can work with res and msg which are in json response
+		}
+
+	        @Override
+		public void onError(String error) {
+          
+                        //if any error encountered
+		}
+	});
+```
 
 ## More info
 The callback group has 5 levels

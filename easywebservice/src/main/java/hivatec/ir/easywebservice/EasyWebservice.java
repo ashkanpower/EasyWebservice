@@ -232,7 +232,6 @@ public class EasyWebservice {
 
 
                 Request request = null;
-                fillQueryParams(httpBuider);
                 fillBodyParams(mBody);
 
                 switch (method){
@@ -241,6 +240,7 @@ public class EasyWebservice {
                         request = builder.url(httpBuider.build()).post(mBody.build()).build();
                         break;
                     case GET:
+                        fillQueryParams(httpBuider);
                         request = builder.url(httpBuider.build()).get().build();
                         break;
                     case PATCH:

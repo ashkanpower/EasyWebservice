@@ -20,7 +20,7 @@ then add library to dependencies
 
 `````
 dependencies {
-	   implementation 'com.github.ashkanpower:EasyWebservice:64d1b83aac'
+	  implementation 'com.github.ashkanpower:easywebservice:b5f5874cb0'
 	}
 ``````
 

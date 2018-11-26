@@ -7,5 +7,8 @@ package hivatec.ir.easywebservice;
 public enum  Method {
 
 	POST,
-	GET
+	GET,
+	PUT,
+	DELETE,
+	PATCH
 }

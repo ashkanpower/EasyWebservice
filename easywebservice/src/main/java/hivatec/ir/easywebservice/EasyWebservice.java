@@ -231,27 +231,33 @@ public class EasyWebservice {
                 }
 
 
-
-
                 Request request = null;
-                if(method == Method.POST) {
+                fillQueryParams(httpBuider);
+                fillBodyParams(mBody);
 
-                    fillBodyParams(mBody);
+                switch (method){
 
-                    request = builder
-                            .url(httpBuider.build())
-                            .post(mBody.build())
-                            .build();
-                }else{
-
-                    fillQueryParams(httpBuider);
-
-                    request = builder.url(httpBuider.build()).get().build();
+                    case POST: default:
+                        request = builder.url(httpBuider.build()).post(mBody.build()).build();
+                        break;
+                    case GET:
+                        request = builder.url(httpBuider.build()).get().build();
+                        break;
+                    case PATCH:
+                        request = builder.url(httpBuider.build()).patch(mBody.build()).build();
+                        break;
+                    case PUT:
+                        request = builder.url(httpBuider.build()).put(mBody.build()).build();
+                        break;
+                    case DELETE:
+                        request = builder.url(httpBuider.build()).delete(mBody.build()).build();
+                        break;
                 }
+
 
                 try {
 
-                    Log.i("webservice", (method == Method.POST ? "POST : " : "GET : ") + httpBuider.build().toString());
+                    Log.i("webservice", (method.toString()) + httpBuider.build().toString());
                     Log.i("webservice", "headers : " + new Gson().toJson(headers));
                     Log.i("webservice", "bodies : " + new Gson().toJson(bodies));
 
@@ -268,8 +274,9 @@ public class EasyWebservice {
                             return cres;
                         } else {
                             Log.e("webservice", "--> " + urlStr + " : " + res);
+                            Log.e("webservice", "--> response body : " + "\n" + res.body().string());
 
-                            cres.error = res.message();
+                            cres.error = res.message() ;
                             return  cres;
                         }
                     }catch (Exception e){

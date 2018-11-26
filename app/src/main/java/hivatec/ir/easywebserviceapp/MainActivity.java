@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
 		}
 
 		new EasyWebservice("http://viewplusapp.ir/api/v1/test")
-				.method(Method.POST)
+				.method(Method.PUT)
 				.addHeader("token", "your_token_hear")
 				.addParam("_id", 100)
 				.addParam(json)

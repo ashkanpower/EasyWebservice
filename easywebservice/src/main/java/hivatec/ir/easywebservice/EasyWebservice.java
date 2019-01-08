@@ -94,7 +94,8 @@ public class EasyWebservice {
             String key = iter.next();
             try {
                 Object value = json.get(key);
-                this.bodies.put(key, value);
+                String val = value.toString();
+                this.bodies.put(key, val);
             } catch (JSONException e) {
                 // Something went wrong!
             }

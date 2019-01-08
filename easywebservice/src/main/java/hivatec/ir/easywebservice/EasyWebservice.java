@@ -678,20 +678,24 @@ public class EasyWebservice {
             }
 
         } catch (JSONException e) {
-            Log.e("webservice", "error while parsing " + key);
+			Log.e("webservice", "error while parsing " + key);
+			Log.e("webservice", e.toString());
             e.printStackTrace();
             return null;
         }catch (IllegalStateException e){
             Log.e("webservice", "error while parsing " + key);
-            e.printStackTrace();
+			Log.e("webservice", e.toString());
+			e.printStackTrace();
             return null;
         }catch (JsonSyntaxException e){
             Log.e("webservice", "error while parsing " + key);
-            e.printStackTrace();
+			Log.e("webservice", e.toString());
+			e.printStackTrace();
             return null;
         }catch (Exception e){
             Log.e("webservice", "error while parsing " + key);
-            e.printStackTrace();
+			Log.e("webservice", e.toString());
+			e.printStackTrace();
             return null;
         }
 

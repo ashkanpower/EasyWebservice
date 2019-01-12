@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,6 +17,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -94,8 +96,8 @@ public class EasyWebservice {
             String key = iter.next();
             try {
                 Object value = json.get(key);
-                String val = value.toString();
-                this.bodies.put(key, val);
+                //String val = value.toString();
+                this.bodies.put(key, value);
             } catch (JSONException e) {
                 // Something went wrong!
             }
@@ -298,17 +300,23 @@ public class EasyWebservice {
                 super.onPostExecute(o);
 
 
-                if(o == null){
-                    callback.onError(REQUEST_ERROR);
-                    return;
-                }
+                try {
+                    if (o == null) {
+                        callback.onError(REQUEST_ERROR);
+                        return;
+                    }
 
-                OkHttpResponse res = (OkHttpResponse) o;
+                    OkHttpResponse res = (OkHttpResponse) o;
 
-                if(res.res.isSuccessful()){
-                    callback.onSuccess(res.body);
-                }else{
-                    callback.onError(res.error);
+                    if (res.res.isSuccessful()) {
+                        callback.onSuccess(res.body);
+                    } else {
+                        callback.onError(res.error);
+                    }
+                }catch (Exception e){
+
+                    Log.e("webservice" , " error while calling callback : " + urlStr + " : " + e.toString());
+                    e.printStackTrace();
                 }
 
 
@@ -352,11 +360,25 @@ public class EasyWebservice {
                 mBody.addFormDataPart(key, value.toString());
             } else {
 
-                mBody.addFormDataPart(key, new Gson().toJson(value));
+				String json = new Gson().toJson(value);
+
+				if(value instanceof JSONObject){
+					json = json.substring("{\"nameValuePairs\":".length(), json.length() - 1);
+				}
+
+				if(value instanceof JSONArray){
+					json = json.substring("{\"values\":".length(), json.length() - 1);
+				}
+
+				mBody.addFormDataPart(key, json);
             }
         }
     }
 
+
+    private String getJsonObject(JSONObject object){
+    	return new Gson().toJson(object);
+	}
 
 
     private void fillQueryParams(HttpUrl.Builder urlBuilder){

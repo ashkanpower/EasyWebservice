@@ -283,6 +283,7 @@ public class EasyWebservice {
                             return  cres;
                         }
                     }catch (Exception e){
+                        e.printStackTrace();
                         cres.error = res.message();
                         return  cres;
                     }

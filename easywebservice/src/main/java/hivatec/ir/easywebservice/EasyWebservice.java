@@ -2,6 +2,7 @@ package hivatec.ir.easywebservice;
 
 import android.annotation.SuppressLint;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 
@@ -18,18 +19,24 @@ import org.json.JSONObject;
 import java.io.File;
 import java.lang.reflect.Type;
 import java.security.GeneralSecurityException;
+import java.security.KeyStore;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
+import okhttp3.ConnectionSpec;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -37,6 +44,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.TlsVersion;
 
 import static javax.xml.transform.OutputKeys.MEDIA_TYPE;
 
@@ -56,7 +64,7 @@ public class EasyWebservice {
     private static HashMap<String, Object> gBodies = new HashMap<>();
     private static HashMap<String, String> gHeaders = new HashMap<>();
 
-    OkHttpClient client = getUnsafeOkHttpClient();
+    OkHttpClient client = getNewHttpClient();
 
     private String urlStr = "";
     private String fakeJson = "";
@@ -736,47 +744,102 @@ public class EasyWebservice {
     }
 
 
-    private static OkHttpClient getUnsafeOkHttpClient() {
-        try {
-            // Create a trust manager that does not validate certificate chains
-            final TrustManager[] trustAllCerts = new TrustManager[] {
-                    new X509TrustManager() {
-                        @Override
-                        public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
-                        }
+    public static OkHttpClient.Builder enableTls12OnPreLollipop(OkHttpClient.Builder client) {
+        if (Build.VERSION.SDK_INT >= 16 && Build.VERSION.SDK_INT < 22) {
+            try {
+                SSLContext sc = SSLContext.getInstance("TLSv1.2");
+                sc.init(null, null, null);
 
-                        @Override
-                        public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
-                        }
 
-                        @Override
-                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                            return new java.security.cert.X509Certificate[]{};
-                        }
-                    }
-            };
-
-            // Install the all-trusting trust manager
-            final SSLContext sslContext = SSLContext.getInstance("SSL");
-            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
-            // Create an ssl socket factory with our all-trusting manager
-            final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
-
-            OkHttpClient.Builder builder = new OkHttpClient.Builder();
-            builder.sslSocketFactory(sslSocketFactory, (X509TrustManager)trustAllCerts[0]);
-            builder.hostnameVerifier(new HostnameVerifier() {
-                @Override
-                public boolean verify(String hostname, SSLSession session) {
-                    return true;
+                TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(
+                        TrustManagerFactory.getDefaultAlgorithm());
+                trustManagerFactory.init((KeyStore) null);
+                TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
+                if (trustManagers.length != 1 || !(trustManagers[0] instanceof X509TrustManager)) {
+                    throw new IllegalStateException("Unexpected default trust managers:"
+                            + Arrays.toString(trustManagers));
                 }
-            });
+                X509TrustManager trustManager = (X509TrustManager) trustManagers[0];
 
-            OkHttpClient okHttpClient = builder.build();
-            return okHttpClient;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+                SSLContext sslContext = SSLContext.getInstance("TLS");
+                sslContext.init(null, new TrustManager[] { trustManager }, null);
+
+
+                client.sslSocketFactory(new Tls12SocketFactory(sc.getSocketFactory()), trustManager);
+
+                ConnectionSpec cs = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
+                        .tlsVersions(TlsVersion.TLS_1_2)
+                        .build();
+
+                List<ConnectionSpec> specs = new ArrayList<>();
+                specs.add(cs);
+                specs.add(ConnectionSpec.COMPATIBLE_TLS);
+                specs.add(ConnectionSpec.CLEARTEXT);
+
+                client.connectionSpecs(specs);
+            } catch (Exception exc) {
+                Log.e("OkHttpTLSCompat", "Error while setting TLS 1.2", exc);
+            }
         }
+
+        return client;
     }
+
+    private OkHttpClient getNewHttpClient() {
+        OkHttpClient.Builder client = new OkHttpClient.Builder()
+                .followRedirects(true)
+                .followSslRedirects(true)
+                .retryOnConnectionFailure(true)
+                .cache(null)
+                .connectTimeout(5, TimeUnit.SECONDS)
+                .writeTimeout(5, TimeUnit.SECONDS)
+                .readTimeout(5, TimeUnit.SECONDS);
+
+        return enableTls12OnPreLollipop(client).build();
+    }
+
+
+//    private static OkHttpClient getUnsafeOkHttpClient() {
+//        try {
+//            // Create a trust manager that does not validate certificate chains
+//            final TrustManager[] trustAllCerts = new TrustManager[] {
+//                    new X509TrustManager() {
+//                        @Override
+//                        public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+//                        }
+//
+//                        @Override
+//                        public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+//                        }
+//
+//                        @Override
+//                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+//                            return new java.security.cert.X509Certificate[]{};
+//                        }
+//                    }
+//            };
+//
+//            // Install the all-trusting trust manager
+//            final SSLContext sslContext = SSLContext.getInstance("SSL");
+//            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+//            // Create an ssl socket factory with our all-trusting manager
+//            final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+//
+//            OkHttpClient.Builder builder = new OkHttpClient.Builder();
+//            builder.sslSocketFactory(sslSocketFactory, (X509TrustManager)trustAllCerts[0]);
+//            builder.hostnameVerifier(new HostnameVerifier() {
+//                @Override
+//                public boolean verify(String hostname, SSLSession session) {
+//                    return true;
+//                }
+//            });
+//
+//            OkHttpClient okHttpClient = builder.build();
+//            return okHttpClient;
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
     private class OkHttpResponse {
 

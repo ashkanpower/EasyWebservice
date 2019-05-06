@@ -26,15 +26,13 @@ public class MainActivity extends AppCompatActivity {
 			e.printStackTrace();
 		}
 
-		new EasyWebservice("http://viewplusapp.ir/api/v1/test")
-				.method(Method.PUT)
-				.addHeader("token", "your_token_hear")
-				.addParam("_id", 100)
-				.addParam(json)
-				.addParam(new Person(10, "the name"))
-				.call(new Callback.AB<Boolean, String>("res", "msg") {
+		new EasyWebservice("http://www.otooapp.com/api/v2/categoryList")
+				.method(Method.POST)
+				.addParam("token", "ea333f21e122858470a3996fc3511e36781d318d2e3f6fd89b608592586c733403b6ee9c")
+				.addParam("districtId", 4)
+				.call(new Callback.A<Config2>() {
 					@Override
-					public void onSuccess(Boolean aBoolean, String s) {
+					public void onSuccess(Config2 config) {
 
 					}
 

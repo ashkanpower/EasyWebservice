@@ -64,12 +64,16 @@ public class EasyWebservice {
     private static HashMap<String, Object> gBodies = new HashMap<>();
     private static HashMap<String, String> gHeaders = new HashMap<>();
 
-    OkHttpClient client = getNewHttpClient();
+    OkHttpClient client;
 
     private String urlStr = "";
     private String fakeJson = "";
     private Method method = Method.POST;
     private int fakeJsonDelay = 3000;
+
+    private int connectTimeout = 10;
+    private int writeTimeout = 10;
+    private int readTimeout = 30;
 
     public EasyWebservice(String url){
 
@@ -86,6 +90,24 @@ public class EasyWebservice {
     public EasyWebservice fakeJson(String json) {
 
         this.fakeJson = json;
+        return this;
+    }
+
+    public EasyWebservice setConnectionTimeOut(int time) {
+
+        this.connectTimeout = time;
+        return this;
+    }
+
+    public EasyWebservice setReadTimeOut(int time) {
+
+        this.readTimeout = time;
+        return this;
+    }
+
+    public EasyWebservice setWriteTimeOut(int time) {
+
+        this.writeTimeout = time;
         return this;
     }
 
@@ -201,6 +223,8 @@ public class EasyWebservice {
 
     @SuppressLint("StaticFieldLeak")
     private void _perform(final CallbackString callback) {
+
+        client = getNewHttpClient(connectTimeout, writeTimeout, readTimeout);
 
         if(fakeJson != null && !fakeJson.equals("")){
 
@@ -785,61 +809,19 @@ public class EasyWebservice {
         return client;
     }
 
-    public static OkHttpClient getNewHttpClient() {
+    public static OkHttpClient getNewHttpClient(int connectTimeout, int writeTimeout, int readTimeout) {
         OkHttpClient.Builder client = new OkHttpClient.Builder()
                 .followRedirects(true)
                 .followSslRedirects(true)
                 .retryOnConnectionFailure(true)
                 .cache(null)
-                .connectTimeout(5, TimeUnit.SECONDS)
-                .writeTimeout(5, TimeUnit.SECONDS)
-                .readTimeout(5, TimeUnit.SECONDS);
+                .connectTimeout(connectTimeout, TimeUnit.SECONDS)
+                .writeTimeout(writeTimeout, TimeUnit.SECONDS)
+                .readTimeout(readTimeout, TimeUnit.SECONDS);
+
 
         return enableTls12OnPreLollipop(client).build();
     }
-
-
-//    private static OkHttpClient getUnsafeOkHttpClient() {
-//        try {
-//            // Create a trust manager that does not validate certificate chains
-//            final TrustManager[] trustAllCerts = new TrustManager[] {
-//                    new X509TrustManager() {
-//                        @Override
-//                        public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
-//                        }
-//
-//                        @Override
-//                        public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
-//                        }
-//
-//                        @Override
-//                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-//                            return new java.security.cert.X509Certificate[]{};
-//                        }
-//                    }
-//            };
-//
-//            // Install the all-trusting trust manager
-//            final SSLContext sslContext = SSLContext.getInstance("SSL");
-//            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
-//            // Create an ssl socket factory with our all-trusting manager
-//            final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
-//
-//            OkHttpClient.Builder builder = new OkHttpClient.Builder();
-//            builder.sslSocketFactory(sslSocketFactory, (X509TrustManager)trustAllCerts[0]);
-//            builder.hostnameVerifier(new HostnameVerifier() {
-//                @Override
-//                public boolean verify(String hostname, SSLSession session) {
-//                    return true;
-//                }
-//            });
-//
-//            OkHttpClient okHttpClient = builder.build();
-//            return okHttpClient;
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
 
     private class OkHttpResponse {
 
